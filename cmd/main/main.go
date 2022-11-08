@@ -20,16 +20,12 @@ func main() {
 	clientID := "Ql9hX0ZBV1FWYnRxTXZLbDFqdDU6MTpjaQ"
 	auth.AuthorizeUser(clientID, "http://localhost:8082")
 
-	me, err := api.LookupUser("MynameisAkeem")
-	if err != nil {
-		panic(err)
-	}
-	_, err = api.ListFollowers(me.ID)
+	me, err := api.LookupUserByUsername("MynameisAkeem")
 	if err != nil {
 		panic(err)
 	}
 
-	user, err := api.LookupUser("Letrell57093938")
+	user, err := api.LookupUserByUsername("Letrell57093938")
 	if err != nil {
 		panic(err)
 	}

@@ -60,7 +60,6 @@ func AuthorizeUser(clientID string, redirectURL string) {
 
 		viper.Set("AccessToken", token)
 		err = viper.WriteConfigAs("auth.json")
-		//_, err = config.WriteConfigFile("auth.json", token)
 		if err != nil {
 			fmt.Println("snap: could not write config file", err)
 			io.WriteString(w, "Error: could not store access token\n")
