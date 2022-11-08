@@ -1,16 +1,42 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"gotweet/pkg/conf"
 	"gotweet/pkg/store"
 	"net/http"
+	"strings"
 
 	"github.com/spf13/viper"
 )
 
-var client = &http.Client{}
+func SendGroupDm(text string, ids []string) {
+	// create JSON payload
+	var jsonStr = []byte(fmt.Sprintf(`{"message": {"text": "%s"},"participant_ids": ["%+v"],"conversation_type": "Group"}`, text, strings.Join(ids, ",")))
+	fmt.Println(string(jsonStr))
+	req, err := http.NewRequest("POST", "https://api.twitter.com/2/dm_conversations", bytes.NewBuffer(jsonStr))
+	if err != nil {
+		panic(err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	// set access token
+	req.Header.Add("Authorization", "Bearer "+viper.GetString("AccessToken"))
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	/*
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			panic(err)
+		}
+	*/
+}
 
 // ListFollowers returns a list of users that follow the user with the given ID,
 // an access token is required to perform this request
@@ -22,7 +48,7 @@ func ListFollowers(id string) ([]store.User, error) {
 	}
 	// inject access token using value saved in config file
 	req.Header.Add("Authorization", "Bearer "+viper.GetString("AccessToken"))
-	resp, err := client.Do(req)
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}

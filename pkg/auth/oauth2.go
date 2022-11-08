@@ -39,7 +39,7 @@ func AuthorizeUser(clientID string, redirectURL string) {
 		// get the authorization code
 		code := r.URL.Query().Get("code")
 		if code == "" {
-			fmt.Println("snap: Url Param 'code' is missing")
+			fmt.Println("Url Param 'code' is missing")
 			io.WriteString(w, "Error: could not find 'code' URL parameter\n")
 
 			// close the HTTP server and return
@@ -50,7 +50,7 @@ func AuthorizeUser(clientID string, redirectURL string) {
 		// trade the authorization code and the code verifier for an access token
 		token, err := getAccessToken(clientID, codeChallenge, code, redirectURL)
 		if err != nil {
-			fmt.Println("snap: could not get access token")
+			fmt.Println("could not get access token")
 			io.WriteString(w, "Error: could not retrieve access token\n")
 
 			// close the HTTP server and return
@@ -61,7 +61,7 @@ func AuthorizeUser(clientID string, redirectURL string) {
 		viper.Set("AccessToken", token)
 		err = viper.WriteConfigAs("auth.json")
 		if err != nil {
-			fmt.Println("snap: could not write config file", err)
+			fmt.Println("could not write config file", err)
 			io.WriteString(w, "Error: could not store access token\n")
 
 			// close the HTTP server and return
@@ -74,11 +74,11 @@ func AuthorizeUser(clientID string, redirectURL string) {
 		<html>
 			<body>
 				<h1>Login successful!</h1>
-				<h2>You can close this window and return to the snap CLI.</h2>
+				<h2>You can close this window and return to the gotweet CLI.</h2>
 			</body>
 		</html>`)
 
-		fmt.Println("Successfully logged into snapmaster API.")
+		fmt.Println("Successfully logged into twitter API.")
 
 		// close the HTTP server
 		cleanup(server)
@@ -87,7 +87,7 @@ func AuthorizeUser(clientID string, redirectURL string) {
 	// parse the redirect URL for the port number
 	u, err := url.Parse(redirectURL)
 	if err != nil {
-		fmt.Printf("snap: bad redirect URL: %s\n", err)
+		fmt.Printf("bad redirect URL: %s\n", err)
 		os.Exit(1)
 	}
 
@@ -95,14 +95,14 @@ func AuthorizeUser(clientID string, redirectURL string) {
 	port := fmt.Sprintf(":%s", u.Port())
 	l, err := net.Listen("tcp", port)
 	if err != nil {
-		fmt.Printf("snap: can't listen to port %s: %s\n", port, err)
+		fmt.Printf("can't listen to port %s: %s\n", port, err)
 		os.Exit(1)
 	}
 
 	// open a browser window to the authorizationURL
 	err = open.Start(authorizationURL)
 	if err != nil {
-		fmt.Printf("snap: can't open browser to URL %s: %s\n", authorizationURL, err)
+		fmt.Printf(": can't open browser to URL %s: %s\n", authorizationURL, err)
 		os.Exit(1)
 	}
 
@@ -133,7 +133,7 @@ func getAccessToken(clientID string, codeVerifier string, authorizationCode stri
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		fmt.Printf("snap: HTTP error: %s", err)
+		fmt.Printf("HTTP error: %s", err)
 		return "", err
 	}
 
@@ -145,7 +145,7 @@ func getAccessToken(clientID string, codeVerifier string, authorizationCode stri
 	// unmarshal the json into a string map
 	err = json.Unmarshal(body, &responseData)
 	if err != nil {
-		fmt.Printf("snap: JSON error: %s", err)
+		fmt.Printf("JSON error: %s", err)
 		return "", err
 	}
 
