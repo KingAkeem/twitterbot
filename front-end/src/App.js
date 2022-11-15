@@ -36,7 +36,8 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-import UserProfile from './queries/user/Profile';
+import UserProfile from './queries/Profile';
+import FollowList from './queries/FollowList'
 
 const Search = styled('form')(({ theme }) => ({
   position: 'relative',
@@ -128,7 +129,6 @@ function MainDrawer(props) {
   const theme = useTheme();
   const navigate = useNavigate();
 
-  const [open, setOpen] = React.useState(false);
   const [searchText, setSearchText] = React.useState("");
   const [dataType, setDataType] = React.useState("user");
 
@@ -139,7 +139,7 @@ function MainDrawer(props) {
         return;
       }
 
-      setOpen(open);
+      props.onDrawerChange(open);
     };
 
   const body = () => (
@@ -151,12 +151,6 @@ function MainDrawer(props) {
         </DrawerHeader>
         <Divider />
         <List>
-          <ListItem key={"Query"} disablePadding>
-            <ListItemButton>
-              <ListItemText primary={"Query"} />
-            </ListItemButton>
-          </ListItem>
-          <Divider />
           <ListItem key={"Export"} disablePadding>
             <ListItemButton>
               <ListItemText primary={"Export"} />
@@ -169,14 +163,14 @@ function MainDrawer(props) {
   return (
     <Box sx={{display: 'flex'}}>
       <CssBaseline/>
-      <AppBar position="fixed" open={open}>
+      <AppBar position="fixed" open={props.open}>
       <Toolbar>
         <IconButton
           color="inherit"
           aria-label="open drawer"
           onClick={toggleDrawer(true)}
           edge="start"
-          sx={{ mr: 2, ...(open && { display: 'none' }) }}
+          sx={{ mr: 2, ...(props.open && { display: 'none' }) }}
         >
           <Menu />
         </IconButton>
@@ -221,26 +215,30 @@ function MainDrawer(props) {
       }}
       variant="persistent"
       anchor={'left'}
-      open={open}
+      open={props.open}
     >
       {body()}
     </Drawer>
-    <Main open={open}>
-      <DrawerHeader/>
-      {props.children}
-      <Routes>
-        <Route path="/user/:username" element={<UserProfile />}/>
-      </Routes>
-    </Main>
     </Box>
   );
 }
 
 function App() {
+  const [open, setOpen] = React.useState(false);
   return (
     <div className="App">
       <header className="App-header">
-        <MainDrawer/>
+        <MainDrawer
+          open={open}
+          onDrawerChange={open => setOpen(open)}
+        />
+        <Main open={open}>
+          <DrawerHeader/>
+          <Routes>
+            <Route path="/user/:username" element={<UserProfile />}/>
+            <Route path="/followers/:username" element={<FollowList />}/>
+          </Routes>
+        </Main>
       </header>
     </div>
   );

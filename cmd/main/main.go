@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
 )
 
@@ -22,9 +23,41 @@ func init() {
 }
 
 func main() {
-	http.HandleFunc("/query", func(w http.ResponseWriter, r *http.Request) {
+	router := mux.NewRouter()
+	router.HandleFunc("/followers/{username}", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		username := r.URL.Query().Get("username")
+		username := mux.Vars(r)["username"]
+		user, err := sdk.LookupUserByUsername(username)
+		if err != nil {
+			errMsg := fmt.Sprintf("Unable to lookup followers by ID %s. Error: %+v", user.ID, err)
+			log.Println(errMsg)
+			w.Write([]byte(errMsg))
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		fmt.Println("user", user)
+		followers, err := sdk.ListFollowers(user.ID)
+		if err != nil {
+			errMsg := fmt.Sprintf("Unable to lookup followers by ID %s. Error: %+v", user.ID, err)
+			log.Println(errMsg)
+			w.Write([]byte(errMsg))
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		fmt.Printf("followers: %+v", followers)
+		err = json.NewEncoder(w).Encode(followers)
+		if err != nil {
+			errMsg := fmt.Sprintf("Unable to write followers %+v. Error: %+v", followers, err)
+			log.Println(errMsg)
+			w.Write([]byte("Unable to write user object"))
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	})
+	router.HandleFunc("/user/{username}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		username := mux.Vars(r)["username"]
 		user, err := sdk.LookupUserByUsername(username)
 		if err != nil {
 			errMsg := fmt.Sprintf("Unable to lookup user by username %s. Error: %+v", username, err)
@@ -44,7 +77,7 @@ func main() {
 		}
 	})
 	log.Println("Server listening on port 8081")
-	err := http.ListenAndServe(":8081", nil)
+	err := http.ListenAndServe(":8081", router)
 	if err != nil {
 		panic(err)
 	}

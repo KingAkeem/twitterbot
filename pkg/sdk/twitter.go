@@ -12,6 +12,10 @@ import (
 	"github.com/spf13/viper"
 )
 
+var (
+	user_fields = []string{"created_at", "description", "location", "profile_image_url", "url", "verified"}
+)
+
 // SendGroupDm sends a single message to multiple users using the IDs given.
 func SendGroupDm(text string, ids []string) error {
 	// create JSON payload
@@ -30,7 +34,7 @@ func SendGroupDm(text string, ids []string) error {
 
 // ListFollowers returns a list of followers for the user with the given ID.
 func ListFollowers(id string) ([]store.User, error) {
-	url := fmt.Sprintf("%s/users/%s/followers", conf.BaseURL, id)
+	url := fmt.Sprintf("%s/users/%s/followers?user.fields=%s", conf.BaseURL, id, strings.Join(user_fields, ","))
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
@@ -56,7 +60,6 @@ func ListFollowers(id string) ([]store.User, error) {
 // LookupUserByUsername returns the user with the given username
 func LookupUserByUsername(username string) (*store.User, error) {
 	// additional information added to the results
-	user_fields := []string{"created_at", "description", "location", "profile_image_url", "url", "verified"}
 	url := fmt.Sprintf("%s/users/by/username/%s?user.fields=%s", conf.BaseURL, username, strings.Join(user_fields, ","))
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
