@@ -17,6 +17,11 @@ import (
 	"github.com/spf13/viper"
 )
 
+/*
+	// Example of retrieving access token using oauth2
+	clientID := "Ql9hX0ZBV1FWYnRxTXZLbDFqdDU6MTpjaQ"
+	auth.AuthorizeUser(clientID, "http://localhost:8082")
+*/
 // AuthorizeUser implements the PKCE OAuth2 flow.
 func AuthorizeUser(clientID string, redirectURL string) {
 	codeChallenge := "challenge"
@@ -58,6 +63,7 @@ func AuthorizeUser(clientID string, redirectURL string) {
 			return
 		}
 
+		// AccessToken can be used for private information
 		viper.Set("AccessToken", token)
 		err = viper.WriteConfigAs("auth.json")
 		if err != nil {

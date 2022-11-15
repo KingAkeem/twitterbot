@@ -1,31 +1,51 @@
 package main
 
 import (
-	"gotweet/pkg/api"
+	"encoding/json"
+	"fmt"
+	"gotweet/pkg/sdk"
+	"log"
+	"net/http"
 
 	"github.com/spf13/viper"
 )
 
 func init() {
-	viper.SetConfigFile("auth.json")
-	viper.Set("ApiToken", "AAAAAAAAAAAAAAAAAAAAAOoQjAEAAAAAL035N2YaEV6NUTxvT%2BJbmnxbM9s%3DpBeFuGYvsnC2FoqY4nc6KPFTbvHbTLv0Awwkh449ga6afpDR3S")
+	// setup authentication configuration
+	viper.SetConfigName("auth")
+	viper.SetConfigType("json")
+	viper.AddConfigPath(".")
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(err)
+	}
 }
 
 func main() {
-	/*
-		clientID := "Ql9hX0ZBV1FWYnRxTXZLbDFqdDU6MTpjaQ"
-		auth.AuthorizeUser(clientID, "http://localhost:8082")
-	*/
+	http.HandleFunc("/query", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		username := r.URL.Query().Get("username")
+		user, err := sdk.LookupUserByUsername(username)
+		if err != nil {
+			errMsg := fmt.Sprintf("Unable to lookup user by username %s. Error: %+v", username, err)
+			log.Println(errMsg)
+			w.Write([]byte(errMsg))
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 
-	me, err := api.LookupUserByUsername("MynameisAkeem")
+		err = json.NewEncoder(w).Encode(user)
+		if err != nil {
+			errMsg := fmt.Sprintf("Unable to write user %+v. Error: %+v", user, err)
+			log.Println(errMsg)
+			w.Write([]byte("Unable to write user object"))
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	})
+	log.Println("Server listening on port 8081")
+	err := http.ListenAndServe(":8081", nil)
 	if err != nil {
 		panic(err)
 	}
-
-	user, err := api.LookupUserByUsername("Letrell57093938")
-	if err != nil {
-		panic(err)
-	}
-
-	api.SendGroupDm("testing", []string{me.ID, user.ID})
 }

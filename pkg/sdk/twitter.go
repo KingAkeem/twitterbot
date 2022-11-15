@@ -1,4 +1,4 @@
-package api
+package sdk
 
 import (
 	"bytes"
@@ -12,34 +12,23 @@ import (
 	"github.com/spf13/viper"
 )
 
-func SendGroupDm(text string, ids []string) {
+// SendGroupDm sends a single message to multiple users using the IDs given.
+func SendGroupDm(text string, ids []string) error {
 	// create JSON payload
 	var jsonStr = []byte(fmt.Sprintf(`{"message": {"text": "%s"},"participant_ids": ["%+v"],"conversation_type": "Group"}`, text, strings.Join(ids, ",")))
-	fmt.Println(string(jsonStr))
 	req, err := http.NewRequest("POST", "https://api.twitter.com/2/dm_conversations", bytes.NewBuffer(jsonStr))
 	if err != nil {
-		panic(err)
+		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	// set access token
+	// set access token, required for non-public operations
 	req.Header.Add("Authorization", "Bearer "+viper.GetString("AccessToken"))
 
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-
-	/*
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			panic(err)
-		}
-	*/
+	_, err = http.DefaultClient.Do(req)
+	return err
 }
 
-// ListFollowers returns a list of users that follow the user with the given ID,
-// an access token is required to perform this request
+// ListFollowers returns a list of followers for the user with the given ID.
 func ListFollowers(id string) ([]store.User, error) {
 	url := fmt.Sprintf("%s/users/%s/followers", conf.BaseURL, id)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -47,7 +36,7 @@ func ListFollowers(id string) ([]store.User, error) {
 		return nil, err
 	}
 	// inject access token using value saved in config file
-	req.Header.Add("Authorization", "Bearer "+viper.GetString("AccessToken"))
+	req.Header.Add("Authorization", "Bearer "+viper.GetString("ApiToken"))
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -66,13 +55,15 @@ func ListFollowers(id string) ([]store.User, error) {
 
 // LookupUserByUsername returns the user with the given username
 func LookupUserByUsername(username string) (*store.User, error) {
-	url := fmt.Sprintf("%s/users/by/username/%s", conf.BaseURL, username)
+	// additional information added to the results
+	user_fields := []string{"created_at", "description", "location", "profile_image_url", "url", "verified"}
+	url := fmt.Sprintf("%s/users/by/username/%s?user.fields=%s", conf.BaseURL, username, strings.Join(user_fields, ","))
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
 	// inject access or api token using value saved in config file
-	req.Header.Add("Authorization", "Bearer "+viper.GetString("AccessToken"))
+	req.Header.Add("Authorization", "Bearer "+viper.GetString("ApiToken"))
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -86,5 +77,6 @@ func LookupUserByUsername(username string) (*store.User, error) {
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println(result.Data)
 	return &result.Data, nil
 }
