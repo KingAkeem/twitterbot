@@ -32,10 +32,10 @@ This will build the front-end code and create a local server at `localhost:3000`
 If it does not, then go to `http://localhost:3000`. Hot reloading is activated so could changes are immediately applied.
 
 ### Back-end
-1. Go to `cmd/main` directory
-2. Run `go run main.go`
+1. Go to root directory of this project
+2. Run `go run cmd/main/main.go`
 
-This will start the back-end at `localhost:8081`. This needs to be run in tandem with the front-end to provide the necessary REST API.
-The port can be updated from `twitterbot.env` using the `PORT` key.
+This will start the back-end at `localhost:{PORT}`. This needs to be run in tandem with the front-end to provide the necessary REST API.
+The port must be updated within `twitterbot.env` using the `PORT` key.
 
 ![twitterbot](https://user-images.githubusercontent.com/13573860/202072671-11c57da1-2b5e-41ae-8b69-2c9ef782c04d.gif)
