@@ -10,12 +10,14 @@ Users can view a wide variety of information from various sites with an easy-to-
 
 ## Setup
 This application requires a variety of software to run locally, this is the only option currently.
-You'll need a Bearer API token, create a `.json` file with `apitoken` key as the bearer token. 
-Place this file in the directory where you will be executing the server command `go run main.go`
+You'll need a Bearer API token, create a `twitterbot.env` file with `API_TOKEN` key as the bearer token.
+Add the `BASE_URL` AND `TOKEN_URL` values from the example as well, place this file in the `conf` directory.
 
-e.g. example `auth.json`
+e.g. example `twitterbot.env`
 ```json
-{ "apitoken": "ASsafdasdfJASI!23Sasdf"}
+BASE_URL="https://api.twitter.com/2"
+TOKEN_URL="https://api.twitter.com/2/oauth2/token"
+API_TOKEN="ASsafdasdfJASI!23Sasdf"
 ```
 
 Languages used are:
@@ -34,3 +36,4 @@ If it does not, then go to `http://localhost:3000`. Hot reloading is activated s
 2. Run `go run main.go`
 
 This will start the back-end at `localhost:8081`. This needs to be run in tandem with the front-end to provide the necessary REST API.
+The port can be updated from `twitterbot.env` using the `PORT` key.

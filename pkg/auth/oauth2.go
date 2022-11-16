@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"gotweet/pkg/conf"
 	"io"
 	"io/ioutil"
 	"net"
@@ -129,7 +128,7 @@ func getAccessToken(clientID string, codeVerifier string, authorizationCode stri
 	payload := strings.NewReader(data)
 
 	// create the request and execute it
-	req, _ := http.NewRequest("POST", conf.TokenURL, payload)
+	req, _ := http.NewRequest("POST", viper.GetString("TOKEN_URL"), payload)
 	req.Header.Add("content-type", "application/x-www-form-urlencoded")
 
 	// Encode username:password combination using base64 encoding as new bearer token to acquire access token

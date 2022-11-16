@@ -3,26 +3,28 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"gotweet/pkg/conf"
 	"gotweet/pkg/sdk"
+	"io/fs"
 	"log"
 	"net/http"
+	"path/filepath"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/spf13/viper"
 )
 
-func init() {
-	// setup authentication configuration
-	viper.SetConfigName("auth")
-	viper.SetConfigType("json")
-	viper.AddConfigPath(".")
-	err := viper.ReadInConfig()
-	if err != nil {
-		panic(err)
-	}
-}
-
 func main() {
+	// attempt to file env file and load config
+	filepath.Walk(".", func(path string, info fs.FileInfo, err error) error {
+		// find twitterbot.env file and load config from directory
+		if info.Name() == "twitterbot.env" {
+			conf.LoadConfig(strings.Replace(path, "twitterbot.env", "", 1))
+		}
+		return nil
+	})
+
 	router := mux.NewRouter()
 	router.HandleFunc("/tweets/{username}", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -128,8 +130,9 @@ func main() {
 		}
 	})
 
-	log.Println("Server listening on port 8081")
-	err := http.ListenAndServe(":8081", router)
+	port := viper.GetString("PORT")
+	log.Println("Server listening on port " + port)
+	err := http.ListenAndServe(port, router)
 	if err != nil {
 		panic(err)
 	}
