@@ -38,6 +38,7 @@ import {
 
 import UserProfile from './queries/Profile';
 import FollowList from './queries/FollowList'
+import TweetList from './queries/TweetList';
 
 const Search = styled('form')(({ theme }) => ({
   position: 'relative',
@@ -236,6 +237,7 @@ function App() {
           <DrawerHeader/>
           <Routes>
             <Route path="/user/:username" element={<UserProfile />}/>
+            <Route path="/tweets/:username" element={<TweetList />} />
             <Route path="/followers/:username" element={<FollowList />}/>
           </Routes>
         </Main>

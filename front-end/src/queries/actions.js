@@ -17,3 +17,13 @@ export async function getFollowers(username) {
     console.error("Unable to fetch followers. Error:", err)
   }
 }
+
+export async function getTweets(username) {
+  try {
+    const data = await fetch(`http://localhost:8081/tweets/${username}`);
+    const result = await data.json();
+    return result;
+  } catch(err) {
+    console.error("Unable to fetch followers. Error:", err)
+  }
+}

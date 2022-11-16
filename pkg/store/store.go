@@ -14,3 +14,25 @@ type User struct {
 	URL             string    `json:"url"`
 	Verified        bool      `json:"verified"`
 }
+
+// Tweet represents a single Twitter post
+type Tweet struct {
+	ID        string    `json:"id"`
+	Text      string    `json:"text"`
+	CreatedAt time.Time `json:"created_at"`
+	Language  string    `json:"lang"`
+	Source    string    `json:"source"`
+	Geo       TweetGeo  `json:"geo"`
+}
+
+// TweetGeo is a tweet location as a geometry (point in particular)
+type TweetGeo struct {
+	Coordinates Coordinate `json:"coordinates"`
+}
+
+// Coordinate is a coordinate object representing a point
+type Coordinate struct {
+	Type        string `json:"type"`
+	Coordinates []int  `json:"coordinates"`
+	PlaceID     string `json:"place_id"`
+}

@@ -24,6 +24,28 @@ func init() {
 
 func main() {
 	router := mux.NewRouter()
+	router.HandleFunc("/tweets/{username}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		username := mux.Vars(r)["username"]
+		tweets, err := sdk.ListTweets(username)
+		if err != nil {
+			errMsg := fmt.Sprintf("Unable to lookup followers by ID %s. Error: %+v", username, err)
+			log.Println(errMsg)
+			w.Write([]byte(errMsg))
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		err = json.NewEncoder(w).Encode(tweets)
+		if err != nil {
+			errMsg := fmt.Sprintf("Unable to write followers %+v. Error: %+v", tweets, err)
+			log.Println(errMsg)
+			w.Write([]byte("Unable to write user object"))
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	})
+
 	router.HandleFunc("/followers/{username}", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		username := mux.Vars(r)["username"]
@@ -35,7 +57,6 @@ func main() {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-		fmt.Println("user", user)
 		followers, err := sdk.ListFollowers(user.ID)
 		if err != nil {
 			errMsg := fmt.Sprintf("Unable to lookup followers by ID %s. Error: %+v", user.ID, err)
@@ -45,7 +66,6 @@ func main() {
 			return
 		}
 
-		fmt.Printf("followers: %+v", followers)
 		err = json.NewEncoder(w).Encode(followers)
 		if err != nil {
 			errMsg := fmt.Sprintf("Unable to write followers %+v. Error: %+v", followers, err)
@@ -55,6 +75,7 @@ func main() {
 			return
 		}
 	})
+
 	router.HandleFunc("/user/{username}", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		username := mux.Vars(r)["username"]
@@ -76,6 +97,7 @@ func main() {
 			return
 		}
 	})
+
 	log.Println("Server listening on port 8081")
 	err := http.ListenAndServe(":8081", router)
 	if err != nil {

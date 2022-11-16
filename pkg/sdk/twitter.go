@@ -13,7 +13,9 @@ import (
 )
 
 var (
-	user_fields = []string{"created_at", "description", "location", "profile_image_url", "url", "verified"}
+	// additional fields used in requests for each object type
+	user_fields  = []string{"created_at", "description", "location", "profile_image_url", "url", "verified"}
+	tweet_fields = []string{"created_at", "source", "text", "geo"}
 )
 
 // SendGroupDm sends a single message to multiple users using the IDs given.
@@ -30,6 +32,32 @@ func SendGroupDm(text string, ids []string) error {
 
 	_, err = http.DefaultClient.Do(req)
 	return err
+}
+
+// ListTweets returns 100 of the most recent tweets for the given user
+func ListTweets(username string) ([]store.Tweet, error) {
+	url := fmt.Sprintf(`%s/tweets/search/recent?query=from:%s&tweet.fields=%s`, conf.BaseURL, username, strings.Join(tweet_fields, ","))
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// inject access token using value saved in config file
+	req.Header.Add("Authorization", "Bearer "+viper.GetString("ApiToken"))
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	// parse and return response data
+	result := struct {
+		Data []store.Tweet `json:"data"`
+	}{}
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+	return result.Data, nil
 }
 
 // ListFollowers returns a list of followers for the user with the given ID.
@@ -80,6 +108,5 @@ func LookupUserByUsername(username string) (*store.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(result.Data)
 	return &result.Data, nil
 }
