@@ -14,7 +14,7 @@ You'll need a Bearer API token, create a `twitterbot.env` file with `API_TOKEN` 
 Add the `BASE_URL` AND `TOKEN_URL` values from the example as well, place this file in the `conf` directory.
 
 e.g. example `twitterbot.env`
-```json
+```env
 BASE_URL="https://api.twitter.com/2"
 TOKEN_URL="https://api.twitter.com/2/oauth2/token"
 API_TOKEN="ASsafdasdfJASI!23Sasdf"
