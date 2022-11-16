@@ -37,3 +37,5 @@ If it does not, then go to `http://localhost:3000`. Hot reloading is activated s
 
 This will start the back-end at `localhost:8081`. This needs to be run in tandem with the front-end to provide the necessary REST API.
 The port can be updated from `twitterbot.env` using the `PORT` key.
+
+![twitterbot](https://user-images.githubusercontent.com/13573860/202072671-11c57da1-2b5e-41ae-8b69-2c9ef782c04d.gif)
