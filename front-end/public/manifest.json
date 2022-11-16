@@ -1,6 +1,6 @@
 {
-  "short_name": "Social App",
-  "name": "Social App Front End",
+  "short_name": "TwitterBot",
+  "name": "Twitter Bot",
   "icons": [
     {
       "src": "logo.svg",
