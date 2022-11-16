@@ -18,6 +18,16 @@ export async function getFollowers(username) {
   }
 }
 
+export async function getFollowing(username) {
+  try {
+    const data = await fetch(`http://localhost:8081/following/${username}`);
+    const result = await data.json();
+    return result;
+  } catch(err) {
+    console.error("Unable to fetch following. Error:", err)
+  }
+}
+
 export async function getTweets(username) {
   try {
     const data = await fetch(`http://localhost:8081/tweets/${username}`);

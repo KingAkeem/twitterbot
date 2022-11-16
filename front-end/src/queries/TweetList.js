@@ -18,7 +18,7 @@ const list = (user) => {
 				<>
 					<ListItem alignItems="flex-start">
 						<ListItemText
-							primary={field[0].toUpperCase() + field.substring(1)}
+							primary={field.toUpperCase()}
 							primaryTypographyProps={{color: "primary"}}
 							secondary={
 							<React.Fragment>
@@ -27,7 +27,6 @@ const list = (user) => {
 							}
 						/>
 					</ListItem>
-					<Divider variant={field === "username" ? "inset" : "fullWidth"} component="li" /> 
 				</>
 			);
 		}
@@ -45,7 +44,14 @@ export default function TweetList(props) {
 
 	return (
 		<List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-			{tweetList && tweetList.map(tweet => list(tweet))}
+			{tweetList && tweetList.map(tweet => {
+				return (
+					<>
+					{list(tweet)}
+					<Divider/>
+					</>
+				);
+			})}
 		</List>
 	)
 }

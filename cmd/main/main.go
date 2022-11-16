@@ -46,6 +46,36 @@ func main() {
 		}
 	})
 
+	router.HandleFunc("/following/{username}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		username := mux.Vars(r)["username"]
+		user, err := sdk.LookupUserByUsername(username)
+		if err != nil {
+			errMsg := fmt.Sprintf("Unable to lookup followers by ID %s. Error: %+v", user.ID, err)
+			log.Println(errMsg)
+			w.Write([]byte(errMsg))
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		followers, err := sdk.ListFollowing(user.ID)
+		if err != nil {
+			errMsg := fmt.Sprintf("Unable to lookup followers by ID %s. Error: %+v", user.ID, err)
+			log.Println(errMsg)
+			w.Write([]byte(errMsg))
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		err = json.NewEncoder(w).Encode(followers)
+		if err != nil {
+			errMsg := fmt.Sprintf("Unable to write followers %+v. Error: %+v", followers, err)
+			log.Println(errMsg)
+			w.Write([]byte("Unable to write user object"))
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+	})
+
 	router.HandleFunc("/followers/{username}", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		username := mux.Vars(r)["username"]

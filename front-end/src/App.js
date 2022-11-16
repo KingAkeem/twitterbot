@@ -37,7 +37,8 @@ import {
 } from "react-router-dom";
 
 import UserProfile from './queries/Profile';
-import FollowList from './queries/FollowList'
+import FollowList from './queries/FollowersList'
+import FollowingList from './queries/FollowingList'
 import TweetList from './queries/TweetList';
 
 const Search = styled('form')(({ theme }) => ({
@@ -239,6 +240,7 @@ function App() {
             <Route path="/user/:username" element={<UserProfile />}/>
             <Route path="/tweets/:username" element={<TweetList />} />
             <Route path="/followers/:username" element={<FollowList />}/>
+            <Route path="/following/:username" element={<FollowingList />}/>
           </Routes>
         </Main>
       </header>

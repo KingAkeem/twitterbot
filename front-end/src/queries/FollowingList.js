@@ -1,18 +1,19 @@
 import * as React from 'react';
+
 import {
-  List,
-  Divider,
-  ListItem,
-  ListItemText,
-  Avatar,
-  ListItemAvatar
+	Avatar,
+	Divider,
+	List,
+	ListItem,
+	ListItemAvatar,
+	ListItemText
 } from '@mui/material';
-import { Check, NotInterested } from '@mui/icons-material';
+
 import { useParams } from 'react-router-dom';
-import { getUser } from './actions';
+import { getFollowing } from './actions';
 
 const list = (user) => {
-	const fields = ["username", "id", "name", "description", "location", "url", "verified"];
+	const fields = ["username", "id", "name", "description", "location", "url"];
 	return fields.map(
 		(field, index) => {
 			return (
@@ -34,29 +35,32 @@ const list = (user) => {
 							</React.Fragment>
 							}
 						/>
-						{field === "verified" ? 
-							<ListItemAvatar>
-								<Avatar>{user[field] ? <Check/> : <NotInterested/>}</Avatar> 
-							</ListItemAvatar> : null}
 					</ListItem>
-					{index !== fields.length-1 ? <Divider variant={field === "username" ? "inset" : "fullWidth"} component="li" /> : null}
 				</>
 			);
 		}
 	)
 }
 
-export default function UserProfile(props) {
+
+export default function FollowingList(props) {
 	const username = useParams()["username"];
 
-	const [user, setUser] = React.useState({});
+	const [followList, setFollowList] = React.useState([]);
 	React.useEffect(() => {
-		getUser(username).then(data => setUser(data));
+		getFollowing(username).then(data => setFollowList(data));
 	}, [username]);
 
 	return (
 		<List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
-			{user && list(user)}
+			{followList.map(user => {
+				return (
+					<>
+					{list(user)}
+					<Divider/>
+					</>
+				);
+			})}
 		</List>
 	)
 }

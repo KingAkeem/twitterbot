@@ -34,7 +34,7 @@ func SendGroupDm(text string, ids []string) error {
 	return err
 }
 
-// ListTweets returns 100 of the most recent tweets for the given user
+// ListTweets returns 100 of the most recent tweets for the given user in the past seven days
 func ListTweets(username string) ([]store.Tweet, error) {
 	url := fmt.Sprintf(`%s/tweets/search/recent?query=from:%s&tweet.fields=%s`, conf.BaseURL, username, strings.Join(tweet_fields, ","))
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -52,6 +52,31 @@ func ListTweets(username string) ([]store.Tweet, error) {
 	// parse and return response data
 	result := struct {
 		Data []store.Tweet `json:"data"`
+	}{}
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
+		return nil, err
+	}
+	return result.Data, nil
+}
+
+// ListFollowing returns a list of following for the user with the given ID.
+func ListFollowing(id string) ([]store.User, error) {
+	url := fmt.Sprintf("%s/users/%s/following?user.fields=%s", conf.BaseURL, id, strings.Join(user_fields, ","))
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	// inject access token using value saved in config file
+	req.Header.Add("Authorization", "Bearer "+viper.GetString("ApiToken"))
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	// parse and return response data
+	result := struct {
+		Data []store.User `json:"data"`
 	}{}
 	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
