@@ -52,7 +52,7 @@ export default function FollowingList(props) {
 	}, [username]);
 
 	return (
-		<List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+		<List sx={{ width: '100%', maxWidth: 500, bgcolor: 'background.paper' }}>
 			{followList.map(user => {
 				return (
 					<>

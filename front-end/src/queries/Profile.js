@@ -55,7 +55,7 @@ export default function UserProfile(props) {
 	}, [username]);
 
 	return (
-		<List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}>
+		<List sx={{ width: '100%', maxWidth: 500, bgcolor: 'background.paper' }}>
 			{user && list(user)}
 		</List>
 	)
